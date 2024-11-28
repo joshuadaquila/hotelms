@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.main-bg{
+  background-image: radial-gradient( circle farthest-corner at 17.1% 22.8%,  rgba(226,24,24,1) 0%, rgba(160,6,6,1) 90% );
+}
+
+.pic-bg{
+  background-image: url(../src/resources/hotel.jpg);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center; 
+  background-attachment: fixed; 
+}
+
+.input-underline {
+  border: none; /* Remove default border */
+  border-bottom: 1px solid black; /* Bottom border color and thickness */
+  outline: none; /* Remove the outline on focus */
+  padding: 8px 0; /* Adjust padding for aesthetic */
+  transition: border-color 0.3s; /* Smooth transition */
+}
+
+.lexend-reg {
+  font-family: "Lexend", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.menu-item{
+  padding: 10px;
+}
+
+.btn:hover {
+  opacity: 0.7;
+  transition: opacity 0.3s ease-in-out;
+}
+.sidebar {
+  width: 320px; /* Fixed width for the sidebar */
+  height: 100vh;
+  color: #fff; /* White text */
+  padding: 20px; /* Padding for aesthetics */
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5); /* Shadow effect */
+}
+
+.content {
+  height: 100%;
+  width: 100%;
+  
+}
+.active {
+  background-color: #ffffff; 
+  color: black;
+  font-weight: bold;
+  border-radius: 20px;
+}
+
+.menu-item:hover{
+  background-color: #fff;
+  color: black;
+  font-weight: bold;
+  border-radius: 20px;
+}
+
+.gabarito-reg {
+  font-family: "Gabarito", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.spinner {
+  width: 10.4px;
+  height: 10.4px;
+  background: #ffffff;
+  color: #ffffff;
+  border-radius: 50%;
+  box-shadow: 13.4px 0,-26.9px 0;
+  animation: dots-h5boszmd 0.5s infinite linear alternate;
+}
+
+@keyframes dots-h5boszmd {
+  50% {
+     box-shadow: 13.4px 0,-13.4px 0;
+  }
+
+  100% {
+     box-shadow: 26.9px 0,-13.4px 0;
+  }
+}
