@@ -115,6 +115,7 @@ const checkoutDateTimeFormatted = formatForDateTimeLocal(checkoutDateTime);
           // console.log('Success:', data);
           localStorage.setItem('showBilling', true);
           localStorage.setItem('guest', guests);
+          window.location.reload();
         }
       })
       .catch((error) => console.error('Error:', error));

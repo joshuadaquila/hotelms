@@ -8,6 +8,7 @@ import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { GuestDetails } from '../components/GuestDetails';
+import { BillingDetails } from '../components/BillingDetails';
 
 export default function Billing() {
   const [loading, setLoading] = useState(true);
@@ -18,6 +19,8 @@ export default function Billing() {
   const [rows, setRows] = useState(10);
   const [showGuestDetails, setShowGuestDetails] = useState(false);
 
+  const [billingData, setBillingData] = useState()
+
   useEffect(() => {
     const loadGuest = async () => {
       setLoading(true);
@@ -26,7 +29,7 @@ export default function Billing() {
         if (error) {
           setError(error);
         } else {
-          // setData(data);
+          setData(data);
           console.log(data)
         }
       } catch (err) {
@@ -47,8 +50,9 @@ export default function Billing() {
     return <div>Error: {error}</div>;
   }
 
-  const handleViewMore = (guest) => {
+  const handleViewMore = (rowData) => {
     setShowGuestDetails(!showGuestDetails);
+    setBillingData(rowData);
   };
 
   const filteredData = data.filter(guest => 
@@ -69,7 +73,7 @@ export default function Billing() {
         <Sidebar menu={'billing'} />
     
       </div>
-      {showGuestDetails && <GuestDetails toggleThis={handleViewMore} guestid={data[0].guestid}/> }
+      {showGuestDetails && <BillingDetails toggleThis={handleViewMore} data={billingData}/> }
       <div className="flex-1 p-10 text-center">
         <p className='text-4xl font-bold'>BILLING AND INVOICING</p>
         
@@ -78,7 +82,7 @@ export default function Billing() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search by First Name, Last Name, or Middle Name"
-            className="p-2 w-full"
+            className="p-2 w-full border"
           />
         </div>
 
@@ -93,14 +97,11 @@ export default function Billing() {
           <Column field="guestid" header="Guest ID" filter filterPlaceholder="Search by Guest ID" />
           <Column field="lastname" header="Last Name" filter filterPlaceholder="Search by Last Name" />
           <Column field="firstname" header="First Name" filter filterPlaceholder="Search by First Name" />
-          <Column field="middlename" header="Middle Name" filter filterPlaceholder="Search by Middle Name" />
-          <Column field="checkindate" header="Check-in Date" filter filterPlaceholder="Search by Check-in Date" />
-          <Column field="checkoutdate" header="Check-out Date" filter filterPlaceholder="Search by Check-out Date" />
-          <Column field="name" header="Room Name" filter filterPlaceholder="Search by Room Name" />
+          <Column field="checkindate" header="Checkin Date" filter filterPlaceholder="Search by Check-in Date" />
           <Column 
             body={(rowData) => (
               <Button 
-                label="View..." 
+                label="View" 
                 onClick={() => handleViewMore(rowData)} 
                 className=" bg-green-600 p-2 rounded-full text-white"
               />

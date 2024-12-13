@@ -65,7 +65,7 @@ export function PaymentForm({
           setError(error);
         } else {
           console.log("Fetched guest ID:", data[0] || data);
-          setGuestId(data[0].guestid + 1); // Adjust based on your data structure
+          setGuestId((data[0]?.guestid ?? 0) + 1);
           setUserId(userId); // Set userid state directly
         }
       } catch (err) {
@@ -141,7 +141,7 @@ export function PaymentForm({
         }
         {saveTransac &&
           <Confirmation message={"Save transaction?"} disabled={submitting} toggleThis={() => setSaveTransac(false)}
-            confirmed={(e) => { e.preventDefault(); setSubmitting(true); saveTransaction(); onSubmit() }}
+            confirmed={(e) => { setSubmitting(true); saveTransaction(); onSubmit() }}
           />
         }
         {showNotPaidErr &&

@@ -1,9 +1,12 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import ualogo from '../resources/ualogo.jpg';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose, faPrint } from "@fortawesome/free-solid-svg-icons";
+import { fetchData } from "../api";
+import Loader from "./Loader";
 
-export const BillingStatement = React.forwardRef(({
+export const BillingDetails = React.forwardRef(({
+  data,
   guestName,
   roomNumber,
   roomCharges,
@@ -15,6 +18,10 @@ export const BillingStatement = React.forwardRef(({
   toggleThis
 }, ref) => {
   const billingRef = useRef(null);
+
+  const [roomData, setRoomData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState([])
 
   // Print function
   const handlePrint = (e) => {
@@ -84,13 +91,50 @@ export const BillingStatement = React.forwardRef(({
     printWindow.print();
   };
 
+  useEffect(() => {
+    const loadGuest = async () => {
+      setLoading(true);
+      try {
+        const { data, error } = await fetchData('getRoomInfo', {roomId: 1});
+        console.log("room", data)
+        if (error) {
+          setError(error);
+        } else {
+          setRoomData(data);
+          console.log("room", data)
+        }
+      } catch (err) {
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    loadGuest();
+  }, []);
+
+  if (loading) {
+    return <p></p>;
+  }
+  
+  if (error.length > 0) {
+    return <p className="text-red-600">Error: {error}</p>; // Show error message
+  }
+  
+  // if (!roomData) {
+  //   return <p className="text-gray-600">No room data available.</p>; // Handle missing data gracefully
+  // }
+  
+
+
+  console.log(roomData)
   return (
     <div  className="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 backdrop-blur-sm flex flex-col items-center justify-center z-50">
       <div  className="relative bg-white p-8 rounded-lg shadow-lg w-11/12 max-w-4xl flex flex-col">
         <FontAwesomeIcon icon={faClose} size="lg" className="absolute -right-0 -top-0 p-2 cursor-pointer" onClick={toggleThis}/>
-        <div className="bg-green-200 outline outline-green-500 rounded-lg mb-4">
+        {/* <div className="bg-green-200 outline outline-green-500 rounded-lg mb-4">
           <p className="p-2">Saved Successfully!</p>
-        </div>
+        </div> */}
 
         <div ref={billingRef}>
         <div className="header flex justify-center items-center flex-col">
@@ -103,12 +147,12 @@ export const BillingStatement = React.forwardRef(({
         <div className="billing-content">
           <div className="grid grid-cols-2 m-4">
             <div>
-              <p><strong>Guest Name:</strong> {guestName}</p>
-              <p><strong>Room Number:</strong> {roomNumber}</p>
+              <p><strong>Guest Name:</strong> {data.lastname.split('|')[0]}, {data.firstname.split('|')[0]}</p>
+              <p><strong>Room Number:</strong> {roomData[0].name}</p>
             </div>
             <div>
               {/* <p><strong>Billing Number:</strong>{billingnumber}</p> */}
-              <p><strong>Payment Date:</strong> {paymentDate.toLocaleString()}</p>
+              {/* <p><strong>Payment Date:</strong> {paymentDate.toLocaleString()}</p> */}
             </div>
             
           </div>
@@ -123,8 +167,8 @@ export const BillingStatement = React.forwardRef(({
             </thead>
             <tbody>
               <tr>
-                <td className="border border-gray-300 p-2">{roomNumber}</td>
-                <td className="border border-gray-300 p-2">P{roomCharges}</td>
+                <td className="border border-gray-300 p-2">{roomData[0].name}</td>
+                <td className="border border-gray-300 p-2">P{roomData[0].price}</td>
               </tr>
             </tbody>
           </table>
@@ -132,9 +176,9 @@ export const BillingStatement = React.forwardRef(({
 
           {/* Total and Payment Details */}
           <div className="text-end mt-4">
-            <p className="total text-lg">Total Amount Due: <span className="font-bold">P{totalAmountDue}</span></p>
-            <p>Amount Paid: P{amountPaid}</p>
-            <p>Change: P{change}</p>
+            <p className="total text-lg">Total Amount Due: <span className="font-bold">P{data.amountdue}</span></p>
+            <p>Amount Paid: P{data.amountreceived}</p>
+            <p>Change: P{data.change}</p>
           </div>
           
         </div>

@@ -545,6 +545,40 @@ video {
   display: none;
 }
 
+.container {
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .container {
+    max-width: 640px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .container {
+    max-width: 1536px;
+  }
+}
+
 .collapse {
   visibility: collapse;
 }
@@ -605,24 +639,14 @@ video {
   margin: 1rem;
 }
 
-.my-4 {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-}
-
-.mx-2 {
-  margin-left: 0.5rem;
-  margin-right: 0.5rem;
-}
-
-.my-2 {
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
 .my-3 {
   margin-top: 0.75rem;
   margin-bottom: 0.75rem;
+}
+
+.my-4 {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }
 
 .mb-1 {
@@ -719,6 +743,10 @@ video {
 
 .h-screen {
   height: 100vh;
+}
+
+.h-28 {
+  height: 7rem;
 }
 
 .min-h-screen {
@@ -847,6 +875,12 @@ video {
 
 .gap-8 {
   gap: 2rem;
+}
+
+.space-x-2 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 0;
+  margin-right: calc(0.5rem * var(--tw-space-x-reverse));
+  margin-left: calc(0.5rem * calc(1 - var(--tw-space-x-reverse)));
 }
 
 .space-y-2 > :not([hidden]) ~ :not([hidden]) {
@@ -981,11 +1015,6 @@ video {
   padding: 2rem;
 }
 
-.px-3 {
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
-}
-
 .px-4 {
   padding-left: 1rem;
   padding-right: 1rem;
@@ -1014,11 +1043,6 @@ video {
 .py-2 {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
-}
-
-.py-3 {
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
 }
 
 .py-4 {
@@ -1162,11 +1186,25 @@ video {
   backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
 }
 
-.main-bg{
-  background-image: radial-gradient( circle farthest-corner at 17.1% 22.8%,  rgba(226,24,24,1) 0%, rgba(160,6,6,1) 90% );
+@font-face {
+  font-family: "Gabarito";
+
+  src: url("./resources/Gabarito-VariableFont_wght.ttf") format("truetype");
 }
 
-.pic-bg{
+.main-bg {
+  background-image: radial-gradient(
+    circle farthest-corner at 17.1% 22.8%,
+    rgba(226, 24, 24, 1) 0%,
+    rgba(160, 6, 6, 1) 90%
+  );
+}
+
+.admin-bg {
+  background: linear-gradient(109.6deg, rgb(0, 0, 0) 11.2%, rgb(247, 30, 30) 100.3%);
+}
+
+.pic-bg {
   background-image: url(../src/resources/hotel.jpg);
   background-size: cover;
   background-repeat: no-repeat;
@@ -1194,7 +1232,7 @@ video {
   font-style: normal;
 }
 
-.menu-item{
+.menu-item {
   padding: 10px;
 }
 
@@ -1227,7 +1265,7 @@ video {
   border-radius: 20px;
 }
 
-.menu-item:hover{
+.menu-item:hover {
   background-color: #fff;
   color: black;
   font-weight: bold;
@@ -1247,17 +1285,17 @@ video {
   background: #ffffff;
   color: #ffffff;
   border-radius: 50%;
-  box-shadow: 13.4px 0,-26.9px 0;
+  box-shadow: 13.4px 0, -26.9px 0;
   animation: dots-h5boszmd 0.5s infinite linear alternate;
 }
 
 @keyframes dots-h5boszmd {
   50% {
-    box-shadow: 13.4px 0,-13.4px 0;
+    box-shadow: 13.4px 0, -13.4px 0;
   }
 
   100% {
-    box-shadow: 26.9px 0,-13.4px 0;
+    box-shadow: 26.9px 0, -13.4px 0;
   }
 }
 

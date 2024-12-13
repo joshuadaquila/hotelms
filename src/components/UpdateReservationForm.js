@@ -7,14 +7,14 @@ import { Notice } from "./Notice";
 
 export default function UpdateReservationForm({ toggleThis, data }) {
   const rooms = [
-    { id: 1, name: "Standard Room - Room 1" },
-    { id: 2, name: "Standard Room - Room 2" },
-    { id: 3, name: "Standard Room - Room 3" },
-    { id: 4, name: "Standard Room - Room 4" },
-    { id: 5, name: "Standard Room - Room 5" },
-    { id: 6, name: "Standard Room - Room 6" },
-    { id: 7, name: "Deluxe Room - Room 1" },
-    { id: 8, name: "Deluxe Room - Room 2" },
+    { id: 1, name: "Standard Room - Room 102" },
+    { id: 2, name: "Standard Room - Room 103" },
+    { id: 3, name: "Standard Room - Room 201" },
+    { id: 4, name: "Standard Room - Room 202" },
+    { id: 5, name: "Standard Room - Room 205" },
+    { id: 6, name: "Standard Room - Room 206" },
+    { id: 7, name: "Deluxe Room - Room 203" },
+    { id: 8, name: "Deluxe Room - Room 204" },
   ];
 
   const [guestName, setGuestName] = useState(data.name);
@@ -50,6 +50,7 @@ export default function UpdateReservationForm({ toggleThis, data }) {
             setShowNotice(true);
           } else {
             console.log('Success:', data);
+            window.location.reload();
           }
         })
         .catch((error) => console.error('Error:', error));

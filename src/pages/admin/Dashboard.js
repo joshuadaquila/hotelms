@@ -14,8 +14,24 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSquare } from '@fortawesome/free-solid-svg-icons';
+import AdminSidebar from '../../components/admin/AdminSidebar';
+import { Bar } from 'react-chartjs-2';
+
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+
+// Register the components to Chart.js
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const localizer = momentLocalizer(moment);
+
 
 const AdminDashboard = () => {
   const [data, setData] = useState([]);
@@ -24,6 +40,7 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [now, setNow] = useState('');
+  const [dataCount, setDataCount] = useState({ currentMonth: 0, previousMonth: 0 });
 
   const updateTime = () => {
     const currentTime = new Date().toLocaleString('en-US', {
@@ -39,10 +56,27 @@ const AdminDashboard = () => {
     setNow(currentTime);
   };
 
-  useEffect(() => {
-    const timer = setInterval(updateTime, 1000);
-    return () => clearInterval(timer);
-  }, []);
+  const chartData = {
+    labels: ['Current Month', 'Previous Month'],
+    datasets: [
+      {
+        label: ['Check-Ins', 'Check-Ins'],
+        data: [dataCount.currentMonth, dataCount.previousMonth],
+        backgroundColor: ['rgba(75, 192, 192, 0.6)', 'rgba(153, 102, 255, 0.6)'],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  // Chart.js options
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: false,
+      },
+    },
+  };
 
   useEffect(() => {
     const loadRooms = async () => {
@@ -51,12 +85,28 @@ const AdminDashboard = () => {
         setError(error);
       } else {
         setData(data);
-        console.log(data)
+        // console.log(data)
       }
       setLoading(false);
     };
     loadRooms();
   }, []);
+
+  useEffect(() => {
+    const fetchMontlyCounts = async () => {
+      const { data, error } = await fetchData('admin/getMonthlyOccupants');
+      if (error) {
+        setError(error);
+      } else {
+        setDataCount({currentMonth: data[0].total_current_month, previousMonth: data[0].total_previous_month})
+        // console.log("DATA", data)
+      }
+      setLoading(false);
+    };
+    fetchMontlyCounts();
+  }, []);
+
+  // console.log("count", dataCount)
 
   useEffect(() => {
     const loadData = async () => {
@@ -127,7 +177,7 @@ const AdminDashboard = () => {
   
   
 
-  console.log("checkin", checkedIn)
+  // console.log("checkin", checkedIn)
 
   const eventStyleGetter = (event) => {
     let backgroundColor = event.resource.type === 'checkedin' ? '#315900' : '#9c9908';
@@ -144,20 +194,20 @@ const AdminDashboard = () => {
   return (
     <div className="flex min-w-screen">
       <div className='w-[320px]'>
-        <Sidebar menu={'dashboard'} />
+        <AdminSidebar menu={'dashboard'} />
       </div>
       <div className="flex-1 p-10">
-        <div className="pic-bg h-60 text-white flex flex-col justify-center items-center relative">
+        <div className="pic-bg h-28 text-white flex flex-col justify-center items-center relative">
           <div className="absolute inset-0 bg-black opacity-50 rounded-lg"></div>
           <div className="text-center relative z-10">
             <p className="text-2xl font-semibold shadow-md mb-1">University of Antique</p>
             <p className="text-4xl font-bold shadow-lg tracking-wide">HOTEL MANAGEMENT SYSTEM</p>
           </div>
-          <div className="relative z-10 my-4 w-10 h-1 bg-white rounded-full"></div>
+          {/* <div className="relative z-10 my-4 w-10 h-1 bg-white rounded-full"></div>
           <div className="p-4 text-center relative z-10">
             <p className="text-lg font-medium">Today is</p>
             <p className="text-4xl font-extrabold shadow-lg mt-1">{now}</p>
-          </div>
+          </div> */}
         </div>
 
         <div className="grid grid-cols-2 mt-12 gap-8">
@@ -205,6 +255,8 @@ const AdminDashboard = () => {
           
 
           <div>
+            <p className="text-4xl font-bold mb-4">Occupancy Trend</p>
+              <Bar data={chartData} options={chartOptions} />
             <p className="text-4xl font-bold mb-4">Calendar</p>
             <Calendar
               localizer={localizer}

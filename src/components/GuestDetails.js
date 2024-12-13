@@ -1,10 +1,11 @@
-import { faArrowCircleRight, faClose, faPlusCircle, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faArrowCircleRight, faClose, faPlusCircle, faPrint, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import { useState } from "react";
 import '../../src/output.css';
 import { useEffect } from "react";
 import { fetchData } from "../api";
+import ualogo from '../resources/ualogo.jpg'
 
 export function GuestDetails({toggleThis, guestid}) {
   const [data, setData] = useState([]);
@@ -60,7 +61,152 @@ export function GuestDetails({toggleThis, guestid}) {
     telephonnums: splitField(data[0].telephonenum),
     remarks: splitField(data[0].remarks),
   };
-  console.log(data)
+  // console.log(data)
+
+  const handlePrint = () => {
+    // Create a new window for printing
+    const printWindow = window.open('', '_blank', 'width=1000,height=800');
+  
+    // Set up the HTML content to be printed
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Guest Details</title>
+          <style>
+            body { 
+              font-family: Arial, sans-serif; 
+              margin: 20px; 
+              line-height: 1.6;
+            }
+            h1, h2, h3 {
+              text-align: center;
+            }
+            .container {
+              max-width: 900px;
+              margin: 0 auto;
+            }
+            .guest-card {
+              border: 1px solid #ddd;
+              padding: 20px;
+              margin-bottom: 20px;
+              border-radius: 8px;
+              background-color: #f9f9f9;
+            }
+            .guest-card h2 {
+              margin-top: 0;
+            }
+            .guest-info {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 15px;
+            }
+            .guest-info p {
+              margin: 5px 0;
+              padding: 10px;
+              border: 1px solid #ccc; /* Added border to fields */
+              border-radius: 4px;
+              background-color: #f9f9f9;
+            }
+            .guest-info strong {
+              width: 200px;
+              display: inline-block;
+            }
+            .guest-info span {
+              color: #555;
+            }
+            .stay-details p {
+              margin: 5px 0;
+              padding: 10px;
+              border: 1px solid #ccc; /* Added border to fields */
+              border-radius: 4px;
+              background-color: #f9f9f9;
+            }
+            .stay-details strong {
+              width: 200px;
+              display: inline-block;
+            }
+            .stay-details span {
+              color: #555;
+            }
+            .logo {
+              text-align: center;
+            }
+            .logo img {
+              width: 100px; /* Adjust the size as needed */
+              max-width: 100%;
+              height: auto;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="logo">
+              <img src="${ualogo}" alt="Logo" id="logoImage" />
+            </div>
+            <h1>University of Antique Hotel</h1>
+            <h2>Guest Information</h2>
+            <div class="guest-card">
+              ${guestDetails.firstnames.map((_, index) => `
+                <h2>Guest ${index + 1}</h2>
+                <div class="guest-info">
+                  <p><strong>Last Name:</strong><span>${guestDetails.lastnames[index] || ''}</span></p>
+                  <p><strong>First Name:</strong><span>${guestDetails.firstnames[index] || ''}</span></p>
+                  <p><strong>Middle Name:</strong><span>${guestDetails.middlenames[index] || ''}</span></p>
+                  <p><strong>Home Address:</strong><span>${guestDetails.homeaddresses[index] || ''}</span></p>
+                  <p><strong>Contact No.:</strong><span>${guestDetails.contactnums[index] || ''}</span></p>
+                  <p><strong>Telephone No.:</strong><span>${guestDetails.telephonnums[index] || ''}</span></p>
+                  <p><strong>Company/Organization:</strong><span>${guestDetails.companies[index] || ''}</span></p>
+                  <p><strong>Company Telephone:</strong><span>${guestDetails.companytels[index] || ''}</span></p>
+                  <p><strong>Company Address:</strong><span>${guestDetails.addresses[index] || ''}</span></p>
+                  <p><strong>Nationality:</strong><span>${guestDetails.nationalities[index] || ''}</span></p>
+                  <p><strong>Email:</strong><span>${guestDetails.emails[index] || ''}</span></p>
+                  <p><strong>Passport No.:</strong><span>${guestDetails.passportnums[index] || ''}</span></p>
+                  <p><strong>Remarks:</strong><span>${guestDetails.remarks[index] || ''}</span></p>
+                </div>
+              `).join('')}
+            </div>
+            
+            <!-- Stay Details Section -->
+            <div class="stay-details">
+              <h3>Stay Details</h3>
+              <p><strong>Check-in Date:</strong><span>${data[0].checkindate || ''}</span></p>
+              <p><strong>Check-out Date:</strong><span>${data[0].checkoutdate || ''}</span></p>
+              <p><strong>Room No.:</strong><span>${data[0].name || ''}</span></p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `);
+  
+    // Preload the logo image and print once it's loaded
+    const logoImage = printWindow.document.getElementById("logoImage");
+
+    const applyZoomAndPrint = () => {
+        // Apply zoom-out effect
+        printWindow.document.body.style.zoom = "0.8";
+        printWindow.document.documentElement.style.zoom = "0.8";
+
+        // Close the document to ensure rendering
+        printWindow.document.close();
+
+        // Wait a short time to ensure rendering, then show print dialog
+        setTimeout(() => {
+            printWindow.print();
+        }, 300); // Adjust the delay as needed
+    };
+
+    // Check if the logo image is loaded
+    logoImage.onload = applyZoomAndPrint;
+
+    // In case the logo is cached and already loaded
+    if (logoImage.complete) {
+        applyZoomAndPrint();
+    }
+
+  };
+  
+  
+
   return (
     <div className="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 backdrop-blur-sm flex 
     items-center justify-center overflow-y-scroll z-50">
@@ -304,6 +450,16 @@ export function GuestDetails({toggleThis, guestid}) {
                 />
               </div>
               
+            </div>
+
+            <div className="flex justify-end items-end mt-4">
+              <button 
+                className="bg-blue-600 text-white p-2 px-4 rounded-full hover:bg-blue-700"
+                onClick={handlePrint}
+              >
+                <FontAwesomeIcon icon={faPrint} className="mr-2"/>
+                Print
+              </button>
             </div>
 
           </div>

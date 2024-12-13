@@ -1,7 +1,8 @@
+const { app, BrowserWindow, screen, ipcMain } = require('electron');
 const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcrypt');
 const path = require('path');
-const dbPath = path.join(__dirname, 'database.sqlite'); 
+const dbPath = path.join(app.getPath('userData'), 'database.sqlite'); 
 
 async function initializeDatabase() {
   const db = new sqlite3.Database(dbPath);
@@ -134,14 +135,24 @@ async function initializeDatabase() {
 
     if (rooms.length === 0) {
         const defaultRooms = [
-            { room_type: 'Standard Room', price: 500.00, status: 'Available', count: 6 },
-            { room_type: 'Deluxe Room', price: 800.00, status: 'Available', count: 2 },
+            {
+                room_type: 'Standard Room',
+                price: 1500.00,
+                status: 'Available',
+                room_numbers: [102, 103, 201, 202, 205, 206],
+            },
+            {
+                room_type: 'Deluxe Room',
+                price: 1500.00,
+                status: 'Available',
+                room_numbers: [203, 204],
+            },
         ];
 
         try {
             for (const room of defaultRooms) {
-                for (let i = 0; i < room.count; i++) {
-                    const roomName = `${room.room_type} - Room ${i + 1}`;
+                for (const roomNumber of room.room_numbers) {
+                    const roomName = `${room.room_type} - Room ${roomNumber}`;
                     await new Promise((resolve, reject) => {
                         db.run(`
                             INSERT INTO rooms (type, price, status, name) VALUES (?, ?, ?, ?)
@@ -164,6 +175,7 @@ async function initializeDatabase() {
         console.log('Default rooms already exist.');
     }
 }
+
 
 insertDefaultRooms();
 

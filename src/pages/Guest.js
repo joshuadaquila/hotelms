@@ -80,7 +80,7 @@ export default function Guest() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search by First Name, Last Name, or Middle Name"
-            className="p-2 w-full"
+            className="p-2 w-full border"
           />
         </div>
 

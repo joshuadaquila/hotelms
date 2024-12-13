@@ -15,6 +15,9 @@ function createWindow() {
 
   // Load React app
   mainWindow.loadURL('http://localhost:3000'); // Development mode with React server
+  // const reactAppPath = path.join(__dirname, 'build', 'index.html');
+  // console.log(reactAppPath);
+  // mainWindow.loadFile(reactAppPath);
   win.removeMenu();
 }
 

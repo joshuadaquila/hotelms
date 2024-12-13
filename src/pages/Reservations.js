@@ -94,7 +94,7 @@ export default function Reservations() {
         </div>
         {showRegForm && <ReservationForm toggleThis={()=> setShowregForm(false)}/>}
         {showUpdateResForm && <UpdateReservationForm data={dataToUpdate} toggleThis={()=> setShowUpdateResForm(false)}/>}
-        {showConf && <Confirmation message={"Are you sure you want to delete this reservation?"} toggleThis={()=> setShowConf(false)} disabled={false} confirmed={()=> postData('deleteReservation', dataToUpdate)}/>}
+        {showConf && <Confirmation message={"Are you sure you want to delete this reservation?"} toggleThis={()=> setShowConf(false)} disabled={false} confirmed={()=> {postData('deleteReservation', dataToUpdate); window.location.reload()}}/>}
         <div className="my-3">
           <p className="text-2xl font-bold mb-3">Table View</p>
           <DataTable 

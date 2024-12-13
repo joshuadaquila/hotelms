@@ -79,14 +79,15 @@ function Checkin() {
   }, []);
 
   const checkOut = (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     postData('checkout', {roomid: roomid})
       .then(({ data, error }) => {
         if (error) {
           console.error('Error:', error);
         } else {
           console.log('Success:', data);
-          
+          window.location.reload()
+          // setShowConfirmation(false);
         }
       })
       .catch((error) => console.error('Error:', error));
@@ -146,14 +147,14 @@ function Checkin() {
   useEffect(() => {
     // Map room names to their state setter functions
     const roomSetters = {
-      'Standard Room - Room 1': setStdRm1,
-      'Standard Room - Room 2': setStdRm2,
-      'Standard Room - Room 3': setStdRm3,
-      'Standard Room - Room 4': setStdRm4,
-      'Standard Room - Room 5': setStdRm5,
-      'Standard Room - Room 6': setStdRm6,
-      'Deluxe Room - Room 1': setDelRm1,
-      'Deluxe Room - Room 2': setDelRm2,
+      'Standard Room - Room 102': setStdRm1,
+      'Standard Room - Room 103': setStdRm2,
+      'Standard Room - Room 201': setStdRm3,
+      'Standard Room - Room 202': setStdRm4,
+      'Standard Room - Room 205': setStdRm5,
+      'Standard Room - Room 206': setStdRm6,
+      'Deluxe Room - Room 203': setDelRm1,
+      'Deluxe Room - Room 204': setDelRm2,
     };
 
     // console.log(occupiedDetails);
@@ -250,12 +251,12 @@ function Checkin() {
         </div>
 
         <div className="grid grid-cols-3 p-10" style={{ gridGap: '20px' }}>
-          <Cardroom num={'1'} status={stdRm1.status} toggleForm={() =>{setRoomId(1), stdRm1.status !== 'Occupied' ? (toggleForm(), setRoomName('Standard Room - Room 1')) : setShowConfirmation(true)}} guest={stdRm1.guest} date={stdRm1.date} />
-          <Cardroom num={'2'} status={stdRm2.status} toggleForm={() =>{setRoomId(2), stdRm2.status !== 'Occupied' ? (toggleForm(), setRoomName('Standard Room - Room 2')) : setShowConfirmation(true)}} guest={stdRm2.guest} date={stdRm2.date} />
-          <Cardroom num={'3'} status={stdRm3.status} toggleForm={() =>{setRoomId(3), stdRm3.status !== 'Occupied' ? (toggleForm(), setRoomName('Standard Room - Room 3')) : setShowConfirmation(true)}} guest={stdRm3.guest} date={stdRm3.date} />
-          <Cardroom num={'4'} status={stdRm4.status} toggleForm={() =>{setRoomId(4), stdRm4.status !== 'Occupied' ? (toggleForm(), setRoomName('Standard Room - Room 4')) : setShowConfirmation(true)}} guest={stdRm4.guest} date={stdRm4.date} />
-          <Cardroom num={'5'} status={stdRm5.status} toggleForm={() =>{setRoomId(5), stdRm5.status !== 'Occupied' ? (toggleForm(), setRoomName('Standard Room - Room 5')) : setShowConfirmation(true)}} guest={stdRm5.guest} date={stdRm5.date} />
-          <Cardroom num={'6'} status={stdRm6.status} toggleForm={() =>{setRoomId(6), stdRm6.status !== 'Occupied' ? (toggleForm(), setRoomName('Standard Room - Room 6')) : setShowConfirmation(true)}} guest={stdRm6.guest} date={stdRm6.date} />
+          <Cardroom num={'102'} status={stdRm1.status} toggleForm={() =>{setRoomId(1), stdRm1.status !== 'Occupied' ? (toggleForm(), setRoomName('Standard Room - Room 102')) : setShowConfirmation(true)}} guest={stdRm1.guest} date={stdRm1.date} />
+          <Cardroom num={'103'} status={stdRm2.status} toggleForm={() =>{setRoomId(2), stdRm2.status !== 'Occupied' ? (toggleForm(), setRoomName('Standard Room - Room 103')) : setShowConfirmation(true)}} guest={stdRm2.guest} date={stdRm2.date} />
+          <Cardroom num={'201'} status={stdRm3.status} toggleForm={() =>{setRoomId(3), stdRm3.status !== 'Occupied' ? (toggleForm(), setRoomName('Standard Room - Room 201')) : setShowConfirmation(true)}} guest={stdRm3.guest} date={stdRm3.date} />
+          <Cardroom num={'202'} status={stdRm4.status} toggleForm={() =>{setRoomId(4), stdRm4.status !== 'Occupied' ? (toggleForm(), setRoomName('Standard Room - Room 202')) : setShowConfirmation(true)}} guest={stdRm4.guest} date={stdRm4.date} />
+          <Cardroom num={'205'} status={stdRm5.status} toggleForm={() =>{setRoomId(5), stdRm5.status !== 'Occupied' ? (toggleForm(), setRoomName('Standard Room - Room 205')) : setShowConfirmation(true)}} guest={stdRm5.guest} date={stdRm5.date} />
+          <Cardroom num={'206'} status={stdRm6.status} toggleForm={() =>{setRoomId(6), stdRm6.status !== 'Occupied' ? (toggleForm(), setRoomName('Standard Room - Room 206')) : setShowConfirmation(true)}} guest={stdRm6.guest} date={stdRm6.date} />
 
         </div>
 
@@ -283,8 +284,8 @@ function Checkin() {
         </div>
 
         <div className="grid grid-cols-2 p-10" style={{ gridGap: '20px' }}>
-          <Cardroom num={'1'} status={delRm1.status} toggleForm={() => {setRoomId(7), delRm1.status !== 'Occupied' ? (toggleForm(), setRoomName('Deluxe Room - Room 1')) : setShowConfirmation(true)}} guest={delRm1.guest} date={delRm1.date} />
-          <Cardroom num={'2'} status={delRm2.status} toggleForm={() => {setRoomId(8), delRm2.status !== 'Occupied' ? (toggleForm(), setRoomName('Deluxe Room - Room 2')) : setShowConfirmation(true)}} guest={delRm2.guest} date={delRm2.date} />
+          <Cardroom num={'203'} status={delRm1.status} toggleForm={() => {setRoomId(7), delRm1.status !== 'Occupied' ? (toggleForm(), setRoomName('Deluxe Room - Room 203')) : setShowConfirmation(true)}} guest={delRm1.guest} date={delRm1.date} />
+          <Cardroom num={'204'} status={delRm2.status} toggleForm={() => {setRoomId(8), delRm2.status !== 'Occupied' ? (toggleForm(), setRoomName('Deluxe Room - Room 204')) : setShowConfirmation(true)}} guest={delRm2.guest} date={delRm2.date} />
         </div>
       </div>
     </div>

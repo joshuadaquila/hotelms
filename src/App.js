@@ -1,10 +1,9 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { HashRouter as Router, Route, Routes } from 'react-router-dom';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Checkin from './pages/Checkin';
 import Guest from './pages/Guest';
-// import Guest from './Guest';
 import '../src/output.css'
 // In your main entry file (e.g., index.js or App.js)
 import 'primereact/resources/themes/saga-blue/theme.css'; // Choose the theme you want
@@ -17,7 +16,7 @@ import Reservations from './pages/Reservations';
 import Billing from './pages/Billing';
 import Reports from './pages/Reports';
 import AdminDashboard from './pages/admin/Dashboard';
-
+import AdminReport from './pages/admin/AdminReport';
 
 function App() {
   return (
@@ -30,8 +29,9 @@ function App() {
         <Route path='/reservations' element={<Reservations />} />
         <Route path='/billing' element={<Billing />} />
         <Route path='/reports' element={<Reports />} />
-
         <Route path='/admin/dashboard' element={<AdminDashboard />} />
+        <Route path='/admin/report' element={<AdminReport />} />
+
       </Routes>
     </Router>
   );

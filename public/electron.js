@@ -5,12 +5,28 @@ const initializeDatabase = require('./dbInitial');
 const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
-
+const fs = require('fs');
+const url = require('url')
 
 const startServer = () => {
   const serverApp = express();
-  const dbPath = path.join(__dirname, 'database.sqlite');
-  const db = new sqlite3.Database(dbPath);
+  const dbPath = path.join(app.getPath('userData'), 'database.sqlite');
+  // Check if the database exists in the userData folder, if not, copy it there
+  if (!fs.existsSync(dbPath)) {
+    const originalDbPath = path.join(__dirname, 'database.sqlite');
+    console.log('Copying database from', originalDbPath, 'to', dbPath);
+    fs.copyFileSync(originalDbPath, dbPath);
+    }
+  
+    // Now use the database path
+    console.log('Using database at:', dbPath);
+    const db = new sqlite3.Database(dbPath, (err) => {
+        if (err) {
+        console.error('Error opening database', err);
+        } else {
+        console.log('Database connected');
+        }
+    });
 
   console.log(dbPath)
 
@@ -49,18 +65,42 @@ const startServer = () => {
       });
   });
 
-  serverApp.get('/api/getReserved', (req, res) => {
-    db.all(`SELECT roomid
-    FROM rooms         
-    WHERE status = 'Reserved'
-    ;
-  `, [], (err, rows) => {
-      if (err) {
-          return res.status(500).json({ error: err.message });
-      }
-      res.json(rows);
-  });
-});
+    serverApp.get('/api/getReserved', (req, res) => {
+        db.all(`SELECT roomid
+        FROM rooms         
+        WHERE status = 'Reserved'
+        ;
+    `, [], (err, rows) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(rows);
+    });
+    });
+
+    serverApp.get('/api/getRoomInfo', (req, res) => {
+        const roomId = req.query.roomId; // Expecting `roomid` as a query parameter
+    
+        if (!roomId) {
+            return res.status(400).json({ error: "Missing required 'roomid' parameter" });
+        }
+    
+        db.all(
+            `SELECT *
+             FROM rooms         
+             WHERE roomid = ?;`,
+            [roomId], // Pass the roomId as a parameter to the SQL query
+            (err, rows) => {
+                if (err) {
+                    console.error("Database error:", err);
+                    return res.status(500).json({ error: "Database query failed" });
+                }
+    
+                res.json(rows);
+            }
+        );
+    });
+    
 
 
     serverApp.get('/api/reservations', (req, res) => {
@@ -351,9 +391,10 @@ const startServer = () => {
 
     serverApp.get('/api/guest', (req, res) => {
         db.all(`SELECT g.guestid, g.lastname, g.firstname, g.middlename, r.name,
-        g.checkindate, g.checkoutdate
-        FROM guests g INNER JOIN rooms r ON g.roomid = r.roomid
-        WHERE r.status = 'Occupied'        
+            g.checkindate, g.checkoutdate
+            FROM guests g INNER JOIN checkins c ON g.guestid = c.guestid
+            INNER JOIN rooms r ON c.roomid = r.roomid
+            WHERE c.status = 'active'      
         
         ;
     `, [], (err, rows) => {
@@ -384,6 +425,65 @@ const startServer = () => {
         });
     });
 
+    serverApp.get('/api/admin/getMonthlyOccupants', (req, res) => {
+        const query = `
+            SELECT 
+            (SELECT COUNT(*) 
+            FROM checkins c INNER JOIN guests g ON c.guestid = g.guestid
+            WHERE strftime('%Y-%m', g.checkindate) = strftime('%Y-%m', 'now')) AS total_current_month,
+            (SELECT COUNT(*) 
+            FROM checkins c INNER JOIN guests g ON c.guestid = g.guestid
+            WHERE strftime('%Y-%m', g.checkindate) = strftime('%Y-%m', datetime('now', '-1 month'))) AS total_previous_month;
+    
+        `;
+        console.log(query);
+        db.all(query, (err, rows) => {
+            if (err) {
+                return res.status(500).json({ error: err.message });
+            }
+            res.json(rows);
+        });
+    });
+
+    serverApp.get('/api/admin/monthlyCounts', (req, res) => {
+        const year = req.query.year || new Date().getFullYear(); // Default to the current year if not provided
+        const query = `
+            SELECT 
+                CASE strftime('%m', g.checkindate)
+                    WHEN '01' THEN 'January'
+                    WHEN '02' THEN 'February'
+                    WHEN '03' THEN 'March'
+                    WHEN '04' THEN 'April'
+                    WHEN '05' THEN 'May'
+                    WHEN '06' THEN 'June'
+                    WHEN '07' THEN 'July'
+                    WHEN '08' THEN 'August'
+                    WHEN '09' THEN 'September'
+                    WHEN '10' THEN 'October'
+                    WHEN '11' THEN 'November'
+                    WHEN '12' THEN 'December'
+                END || ' ' || strftime('%Y', g.checkindate) AS month,
+                COUNT(DISTINCT c.roomid) AS occupied_rooms
+            FROM checkins c
+            INNER JOIN guests g ON c.guestid = g.guestid
+            WHERE strftime('%Y', g.checkindate) = ?
+            GROUP BY strftime('%Y-%m', g.checkindate);
+        `;
+    
+        // Log the query and year for debugging
+        console.log(`Executing query for year: ${year}`);
+    
+        db.all(query, [year], (err, rows) => { // Bind the year parameter securely
+            if (err) {
+                console.error('Database error:', err.message);
+                return res.status(500).json({ error: 'Internal server error' });
+            }
+    
+            res.json(rows);
+        });
+    });
+    
+
     serverApp.get('/api/getLatestId', (req, res) => {
         const query = `
             SELECT seq as guestid FROM sqlite_sequence WHERE name = 'guests';
@@ -398,7 +498,11 @@ const startServer = () => {
     });
     serverApp.get('/api/billing', (req, res) => {
         const query = `
-            SELECT * FROM payments;
+            SELECT g.*, p.* 
+            FROM guests g INNER JOIN checkins c
+            ON g.guestid = c.guestid INNER JOIN payments p
+            ON c.paymentid = p.paymentid
+            WHERE c.status = 'active'
         `;
         console.log(query);
         db.all(query, (err, rows) => {
@@ -615,8 +719,6 @@ const startServer = () => {
         });
     });
 
-    // Ensure you have this middleware to parse JSON bodies
-
     serverApp.post('/api/saveTransaction', (req, res) => {
         const {
             guestid,
@@ -717,42 +819,75 @@ const startServer = () => {
   });
 };
 
+// Function to stop your server
+function stopServer() {
+    if (server) {
+        server.close(() => {
+            console.log('Server stopped');
+        });
+    }
+}
+
+
+let win; // Main window reference
+let server; // Server reference
+
 function createWindow() {
+    // Get the primary display's size
     const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-    const mainWindow = new BrowserWindow({
-        width: width,
-        height: height,
-        autoHideMenuBar: true,
+
+    // Create the browser window with the display's dimensions
+    win = new BrowserWindow({
+        width,
+        height,
+        icon: path.join(__dirname, '../src/resources/hmslogo.png'),
         webPreferences: {
-            contextIsolation: false, // Set to false for simplicity (not recommended for production)
-            nodeIntegration: true, // Allow Node.js integration
-            allowRunningInsecureContent: true,
-            webSecurity: false
+            nodeIntegration: true,
         },
     });
 
-    console.log('Main window created'); // Debug log
-    mainWindow.loadURL('http://localhost:3000');
-    mainWindow.webContents.on('did-finish-load', () => {
-        console.log('React app loaded'); 
+    // Load the React app
+    // win.loadURL(`file://${__dirname}/../build/index.html`);
+    win.loadURL("http://localhost:3000")
+
+    // Event: Window closed
+    win.on("closed", () => {
+        win = null;
     });
 }
 
-app.on('ready', () => {
-    createWindow();
-    initializeDatabase();
-    startServer();
-});
+// Ensure only one instance of the app is running
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) {
+    app.quit(); // Quit if another instance is already running
+} else {
+    app.on('second-instance', () => {
+        // If another instance is attempted, focus the existing window
+        if (win) {
+            if (win.isMinimized()) win.restore();
+            win.focus();
+        }
+    });
 
+    // App ready
+    app.on('ready', () => {
+        createWindow();
+        initializeDatabase();
+        startServer();
+    });
+}
+
+// Close servers when the app is closed
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
+        stopServer(); // Custom function to stop the server
         app.quit();
     }
 });
 
+// macOS specific: Re-create a window if none are open
 app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-        console.log('App is ready'); // Debug log
         createWindow();
     }
 });
